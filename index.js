@@ -124,6 +124,7 @@ io.on('connection', client => {
 
       // push this newly created todo to our database
       db.push(t)
+      client.broadcast.emit('client_add', t)
 
       // resave
       console.log('  add %j', t)
@@ -138,6 +139,8 @@ io.on('connection', client => {
    * Updating of state. This really just discards the todo.
    */
   client.on('update', todo => {
+    client.broadcast.emit('client_update', todo)
+
     for (let t of db) {
       if (t.text === todo.text) {
         t.done = todo.done

@@ -23,6 +23,11 @@
   /**
    * V.
    */
+  function cleanText( text ) {
+    // cleans up text to be used as id
+    return text.toLowerCase().replace(/\W+/g, '-')
+  }
+
   function _render() {
     list.innerHTML = ''
 
@@ -44,6 +49,7 @@
        * escaped & can't inject HTML.
        */
       li.appendChild(checkbox)
+      li.id = cleanText(todo.text)
       li.innerText = todo.text
       li.innerHTML = checkbox.outerHTML + li.innerHTML
 
@@ -167,6 +173,49 @@
 
     // rerender
     render()
+  })
+
+  /**
+   * Add from other clients.
+   */
+  sock.on('client_add', function gotBroadcastAdd( todo ) {
+    // add to local collection
+    todos.push(todo)
+
+    // rerender
+    render()
+  })
+
+  sock.on('client_update', function gotBroadcastUpdate( todo ) {
+    console.warn('got update: ' + JSON.stringify(todo))
+
+    let found = false
+
+    for (let t of todos) {
+      if (t.text === todo.text) {
+        t.done = todo.done
+        found = true
+
+        /**
+         * Update view.
+         */
+        const elm = document.getElementById(cleanText(t.text))
+        const cb = elm.children[0]
+        
+        cb.checked = t.done
+        elm.setAttribute('class', t.done ? 'done' : '')
+
+        return 
+      }
+    }
+
+    /**
+     * If not found in update, just add.
+     */
+    if (!found) {
+      todos.push(todo)
+      render()
+    }
   })
 
   /**
