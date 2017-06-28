@@ -11,13 +11,25 @@
     <link rel="stylesheet" href="css/index.css">
   </head>
   <body>
+    <!-- No JS warning. -->
+    <div class="warning">Your browser does not have javascript. Some features will not be available.</div>
+
+    <!--- Core UI.  -->
     <main role="main">
       <form class="input" method="post">
         <input class="todo-text" type="text" name="todoText" placeholder="Enter your todo item here" autofocus>
+        <footer>
+          <a href="#" class="all-done" title="Feature not available.">Mark all as done</a>
+        </footer>
       </form>
 
       <ul class="todo-list">%s</ul>
     </main>
+
+    <script>
+      document.querySelector('.warning').remove()
+      document.querySelector('.all-done').removeAttribute('title')
+    </script>
 
     <script src="/socket.io/socket.io.js" defer></script>
     <script src="js/index.js" async defer></script>

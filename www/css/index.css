@@ -29,6 +29,15 @@ main {
   vertical-align: middle;
 }
 
+.warning {
+  position: fixed;
+
+  width: 100%;
+  text-align: center;
+
+  padding: 1rem;
+}
+
 .input,
 .todo-list {
   width: 60%;
@@ -81,6 +90,12 @@ main {
   border: none;
   padding: 1rem .8rem;
   width: 100%;
+}
+
+form footer {
+  padding-top: 1rem;
+  font-size: .7rem;
+  text-align: right;
 }
 
 @media (max-width: 768px) {

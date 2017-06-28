@@ -13,6 +13,7 @@
   const input = document.querySelector('.todo-text')
   const form = document.querySelector('form')
   const error = document.querySelector('.error')
+  const doneAll = document.querySelector('.all-done')
 
   /**
    * M.
@@ -108,6 +109,19 @@
       sock.emit('update', todo)
     }
   }
+
+  doneAll.addEventListener('click', evt => {
+    evt.preventDefault()
+
+    // mark all as done
+    todos.forEach(todo => {
+      todo.done = true
+      sock.emit('update', todo)
+    })
+
+    // rerender
+    render()
+  })
 
   form.addEventListener('submit', function addEvent(evt) {
     evt.preventDefault()
