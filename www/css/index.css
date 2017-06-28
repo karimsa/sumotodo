@@ -12,8 +12,6 @@ body,
 main {
   height: 100%;
   width: 100%;
-
-  overflow: hidden;
 }
 
 body {
@@ -96,6 +94,27 @@ form footer {
   padding-top: 1rem;
   font-size: .7rem;
   text-align: right;
+}
+
+.offline-warning {
+  position: absolute;
+  top: -50px;
+
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  background: red;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.offline-warning.in {
+  top: 0;
+}
+
+.offline-warning,
+.offline-warning.in {
+  transition: .5s all ease;
 }
 
 @media (max-width: 768px) {

@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="css/index.css">
   </head>
   <body>
+    <!-- Offline warning. -->
+    <div class="offline-warning">You're offline. The todo app will continue to work but the data will be stored when your network comes back.</div>
+
     <!-- No JS warning. -->
     <div class="warning">Please enable JavaScript in your browser to use this app.</div>
 
@@ -32,6 +35,7 @@
     </script>
 
     <script src="/socket.io/socket.io.js" defer></script>
+    <script src="js/socket.js" defer></script>
     <script src="js/index.js" async defer></script>
   </body>
 </html>

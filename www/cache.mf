@@ -1,8 +1,9 @@
 CACHE MANIFEST
-# 1498626707115
+# 1498627066861
 
 CACHE:
 index.html
+/js/socket.js
 /js/index.js
 /css/normalize.css
 /css/index.css
