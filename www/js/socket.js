@@ -18,6 +18,35 @@ window.io = window.io || function () {
   offline.classList.add('in')
 
   /**
+   * Notify when network is back.
+   */
+  function checkNet() {
+    var xhr = new XMLHttpRequest()
+    var failed = false
+
+    xhr.onerror = function () {
+      failed = true
+      setTimeout(checkNet, 500)
+    }
+
+    xhr.onload = function () {
+      if (!failed) {
+        offline.classList.remove('in')
+
+        setTimeout(function () {
+          offline.innerText = 'The network is back. Please refresh to continue online.'
+          offline.classList.add('in')
+        }, 500)
+      }
+    }
+
+    xhr.open('GET', location.pathname + '?ts=' + Date.now(), true)
+    xhr.send(null)
+  }
+
+  checkNet()
+
+  /**
    * Reveal polyfill.
    */
   return {
