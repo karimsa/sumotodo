@@ -1,32 +1,157 @@
-const server = io('http://localhost:3003/');
-const list = document.getElementById('todo-list');
+~ function () {
+  'use strict'
 
-// NOTE: These are all our globally scoped functions for interacting with the server
-// This function adds a new todo from the input
-function add() {
-    console.warn(event);
-    const input = document.getElementById('todo-input');
+  /**
+   * Client socket.
+   */
+  const sock = io()
 
-    // Emit the new todo as some data to the server
-    server.emit('make', {
-        titlé : input.value
-    });
+  /**
+   * Important elements.
+   */
+  const list = document.querySelector('.todo-list')
+  const input = document.querySelector('.todo-text')
+  const form = document.querySelector('form')
+  const error = document.querySelector('.error')
 
-    // Clear the input
-    input.value = '';
-    // TODO: refocus the element
-}
+  /**
+   * M.
+   */
+  const todos = []
 
-function render(todo) {
-    console.log(todo);
-    const listItem = document.createElement('li');
-    const listItemText = document.createTextNode(todo.title);
-    listItem.appendChild(listItemText);
-    list.append(listItem);
-}
+  /**
+   * V.
+   */
+  function _render() {
+    list.innerHTML = ''
 
-// NOTE: These are listeners for events from the server
-// This event is for (re)loading the entire list of todos from the server
-server.on('load', (todos) => {
-    todos.forEach((todo) => render(todo));
-});
+    todos.forEach(todo => {
+      const li = document.createElement('li')
+      let checkbox = document.createElement('input')
+      checkbox.type = 'checkbox'
+
+      /**
+       * Add [checked='true'] if the state is done.
+       */
+      if (todo.done) {
+        checkbox.setAttribute('checked', 'true')
+        li.classList.add('done')
+      }
+
+      /**
+       * Some hacks to make sure that the todo's text is
+       * escaped & can't inject HTML.
+       */
+      li.appendChild(checkbox)
+      li.innerText = todo.text
+      li.innerHTML = checkbox.outerHTML + li.innerHTML
+
+      /**
+       * The first (and only) child.
+       */
+      checkbox = li.children[0]
+
+      /**
+       * Create toggling function.
+       */
+      const toggle = todoToggle(todo, li, checkbox)
+
+      /**
+       * Attach it to the checkbox.
+       */
+      checkbox.addEventListener('change', toggle)
+
+      /**
+       * But also to the item so that you can click anywhere.
+       */
+      li.addEventListener('click', evt => {
+        // invert checkbox
+        if (evt.target !== checkbox) {
+          evt.preventDefault()
+          checkbox.checked = !checkbox.checked
+        }
+
+        // update data
+        toggle({ preventDefault: function () { /* noop */ } })
+      })
+
+      /**
+       * Add to DOM.
+       */
+      list.appendChild(li)
+    })
+  }
+
+  /**
+   * V public.
+   * 
+   * Will run render when animation frame is available.
+   */
+  function render() {
+    requestAnimationFrame(_render)
+  }
+
+  /**
+   * C.
+   */
+  function todoToggle(todo, elm, cb) {
+    return function toggleClicked(evt) {
+      evt.preventDefault()
+
+      // update state based on checkbox
+      todo.done = !! cb.checked
+    
+      // update style state
+      elm.setAttribute('class', todo.done ? 'done' : '')
+
+      // update on backend
+      sock.emit('update', todo)
+    }
+  }
+
+  form.addEventListener('submit', function addEvent(evt) {
+    evt.preventDefault()
+
+    // grab value, then discard
+    let todo = input.value.trim()
+    input.value = ''
+
+    if (todo) {
+      // create object
+      todo = {
+        text: todo,
+        done: false,
+        init: Date.now()
+      }
+
+      // send todo for storage
+      sock.emit('add', todo)
+
+      // add to list
+      todos.push(todo)
+
+      // rerender
+      render()
+    }
+  })
+
+  /**
+   * Load old todos from backend.
+   */
+  sock.on('load', function loadedTodosFromServer(_todos) {
+    // in case load takes a while and we have already
+    // added todos
+    _todos.forEach(todo => todos.push(todo))
+
+    // rerender
+    render()
+  })
+
+  /**
+   * Setup error listener.
+   */
+  sock.on('fail', err => {
+    error.innerText = err
+    document.documentElement.classList.add('error')
+  })
+}()
