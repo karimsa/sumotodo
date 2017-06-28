@@ -8,9 +8,11 @@
     "npm": ">= 4"
   },
   "scripts": {
-    "start" : "node ."
+    "test": "npm test",
+    "start": "node ."
   },
   "dependencies": {
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "socket.io": "^2.0.3"
   }
