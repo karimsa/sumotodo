@@ -1,6 +1,6 @@
 const server = require('socket.io')();
-const firstTodos = require('./data');
-const Todo = require('./todo');
+const firstTodos = require('./lib/data');
+const Todo = require('./lib/todo');
 
 server.on('connection', (client) => {
     // This is going to be our fake 'database' for this application
