@@ -5,7 +5,7 @@
 
 // config defaults
 process.env.PORT = process.env.PORT || 8080
-const SAVE_INTERVAL = 750
+const SAVE_INTERVAL = 100
 
 const fs = require('fs')
     , path = require('path')
@@ -54,6 +54,7 @@ function storeData( force = false ) {
     
     // forced restore... in a bit
     if (storeDataAgain) {
+      storeDataAgain = false
       return setTimeout(() => storeData(true), SAVE_INTERVAL)
     }
 
