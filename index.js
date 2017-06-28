@@ -5,6 +5,7 @@
 
 // config defaults
 process.env.PORT = process.env.PORT || 8080
+const SAVE_INTERVAL = 750
 
 const fs = require('fs')
     , path = require('path')
@@ -49,7 +50,7 @@ function storeData( force = false ) {
     
     // forced restore... in a bit
     if (storeDataAgain) {
-      return setTimeout(() => storeData(true), 100)
+      return setTimeout(() => storeData(true), SAVE_INTERVAL)
     }
 
     // release the lock
