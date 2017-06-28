@@ -31,7 +31,11 @@ let storeDataAgain = false
 
 // store data cycle
 function storeData( force = false ) {
+  /**
+   * Check lock; otherwise, lock.
+   */
   if (storeDataLock && !force) return (storeDataAgain = true)
+  storeDataLock = true
 
   /**
    * Discard done items.
