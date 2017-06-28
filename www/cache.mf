@@ -1,0 +1,12 @@
+CACHE MANIFEST
+# 1498626707115
+
+CACHE:
+index.html
+/js/index.js
+/css/normalize.css
+/css/index.css
+https://fonts.googleapis.com/css?family=Open+Sans
+
+NETWORK:
+*
