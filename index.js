@@ -108,6 +108,13 @@ io.on('connection', client => {
       // validate
       t = new Todo(t)
 
+      // verify that there is no duplicate
+      for (let b of db) {
+        if (b.text === t.text) {
+          throw new Error('Cannot add duplicate item.')
+        }
+      }
+
       // push this newly created todo to our database
       db.push(t)
 
