@@ -65,48 +65,49 @@ function storeData( force = false ) {
 /**
  * Handle the data storage.
  */
-app.post('/', require('body-parser').urlencoded({ extended: true }), (req, res, next) => {
-  const todo = new Todo({
-    text: req.body.todoText,
-    done: false
-  })
-
-  // update the db
-  console.log('  add %j', todo)
-  db.push(todo)
-  storeData()
-
-  // move to regular routing
-  next()
+app.post('/', (req, res) => {
+  res.end('This feature isn\'t supported in favour of the things you can do with JS.')
 })
 
 /**
  * Static-ish. A bit of server-side rendering.
  */
-const static = express.static(`${__dirname}/www`)
-app.use((req, res, next) => {
-  const file = '.' + (req.url === '/' ? '/index.html' : req.url)
-  const pathtofile = path.resolve(__dirname, 'www' , file)
-
-  /**
-   * If index, do some custom rendering.
-   */
-  if (file === './index.html') {
-    const html = fs.readFileSync(pathtofile, 'utf8')
-    return res.end(util.format.call(util, html, db.join('')))
-  }
-
-  /**
-   * Send file.
-   */
-  res.sendFile(pathtofile)
-})
+app.use(express.static(`${__dirname}/www`))
 
 /**
  * Handle real-time communication.
  */
 io.on('connection', client => {
-  client.emit('load', db)
+  client.on('sync', offlineTodos => {
+    console.log('  sync %j', offlineTodos)
+
+    // try and update db
+    offlineTodos.forEach(t => {
+      let found = false
+
+      /**
+       * Update the state of an existing entry.
+       */
+      db = db.filter(b => {
+        if (b.text === t.text) {
+          b.done = t.done
+          found = true
+        }
+
+        return !b.done
+      })
+
+      /**
+       * If no match, just add new entry.
+       */
+      if (!found) {
+        db.push(t)
+      }
+    })
+
+    // send updated db
+    client.emit('load', db)
+  })
 
   client.on('add', t => {
     try {

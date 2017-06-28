@@ -106,7 +106,7 @@
       elm.setAttribute('class', todo.done ? 'done' : '')
 
       // update on backend
-      sock.emit('update', todo)
+      save(() => sock.emit('update', todo))
     }
   }
 
@@ -116,7 +116,7 @@
     // mark all as done
     todos.forEach(todo => {
       todo.done = true
-      sock.emit('update', todo)
+      save(() => sock.emit('update', todo))
     })
 
     // rerender
@@ -138,16 +138,21 @@
         init: Date.now()
       }
 
-      // send todo for storage
-      sock.emit('add', todo)
-
       // add to list
       todos.push(todo)
+
+      // send todo for storage
+      save(() => sock.emit('add', todo))
 
       // rerender
       render()
     }
   })
+
+  function save( fn ) {
+    localStorage.setItem('db', JSON.stringify(todos))
+    fn()
+  }
 
   /**
    * Load old todos from backend.
@@ -157,9 +162,23 @@
     // added todos
     _todos.forEach(todo => todos.push(todo))
 
+    // store again
+    localStorage.setItem('db', JSON.stringify(todos))
+
     // rerender
     render()
   })
+
+  /**
+   * Run sync in case anything was added while we were offline.
+   */
+  sock.emit('sync', function () {
+    // try and load from localStorage
+    try { return JSON.parse(localStorage.getItem('db') || '[]') }
+    
+    // if errors happen, just start fresh
+    catch (_) { return [] }
+  }())
 
   /**
    * Setup error listener.
