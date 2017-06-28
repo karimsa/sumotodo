@@ -98,7 +98,7 @@ form footer {
 
 .offline-warning {
   position: absolute;
-  top: -50px;
+  top: -100%;
 
   width: 100%;
   text-align: center;
